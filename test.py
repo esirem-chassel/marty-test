@@ -58,7 +58,7 @@ def handle_client(client_socket, address):
             
             frame = ws.decode(data)
 
-            print(f"Text messages : ", frame.getAllMessages()['text'])
+            print(f"Stats : ", frame.getStats())
             
             reply = ws.encode(
                 b"ACK",

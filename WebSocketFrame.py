@@ -141,10 +141,12 @@ class WebSocketFrame():
         if fin:
             if self.rxFrameIsText:
                 self.textMsgs.append(self.rxFrameData.decode('utf-8'))
+                print(f"TEXT data detected : {self.rxFrameData.decode('utf-8')}")
                 self.statsText += 1
             else:
                 logger.debug(f"wsFrame BINARY DONE {''.join('{:02x}'.format(x) for x in self.rxFrameData)}")
                 self.binaryMsgs.append(self.rxFrameData[:])
+                print(f"BIN data detected : {self.rxFrameData[:]}")
                 self.statsBinary += 1
             self.rxFrameData.clear()
         return True
@@ -185,8 +187,11 @@ class WebSocketFrame():
         self.addDataToDecode(data=raw)
         return self
     
-    def getAllMessages(self):
+    def getStats(self):
         return {
-            'text': self.textMsgs,
-            'bin': self.binaryMsgs
+            "pings": self.statsPings,
+            "pongs": self.statsPongs,
+            "text": self.statsText,
+            "bin": self.statsBinary
         }
+    
