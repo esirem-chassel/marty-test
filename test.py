@@ -1,7 +1,7 @@
 import socket
 import threading
 
-import WebSocketFrame
+from WebSocketFrame import WebSocketFrame
 
 HOST = "0.0.0.0"
 PORT = 80
@@ -58,9 +58,9 @@ def handle_client(client_socket, address):
 
             frame = WebSocketFrame.decode(data)
 
-            print("Opcode :", frame.opcode)
-            print("Payload brut :", frame.payload)
-            print("Hex :", frame.payload.hex())
+            print("Opcode :", frame["opcode"])
+            print("Payload brut :", frame["payload"])
+            print("Hex :", frame["payload"].hex())
 
             reply = WebSocketFrame.encode(
                 b"ACK",
@@ -72,6 +72,7 @@ def handle_client(client_socket, address):
             client_socket.send(reply)
 
         except Exception as e:
+            e.with_traceback()
             print("Erreur :", e)
             break
 
