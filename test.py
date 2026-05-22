@@ -52,20 +52,19 @@ def handle_client(client_socket, address):
 
         try:
             data = client_socket.recv(4096)
-
+            ws = WebSocketFrame()
             if not data:
                 break
+            
+            frame = ws.decode(data)
 
-            frame = WebSocketFrame.decode(data)
-
-            print("Opcode :", frame["opcode"])
-            print("Payload brut :", frame["payload"])
-            print("Hex :", frame["payload"].hex())
-
-            reply = WebSocketFrame.encode(
+            print(f"Text messages : ", frame)
+            
+            reply = ws.encode(
                 b"ACK",
                 opcode=WebSocketFrame.OPCODE_BINARY,
-                useMask=False
+                useMask=False,
+                fin=True
             )
 
             # Echo simple :
