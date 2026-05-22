@@ -180,3 +180,69 @@ class WebSocketFrame():
         if len(mask) != 4:
             return
         return bytes(b ^ m for b, m in zip(data, itertools.cycle(mask)))
+
+    @staticmethod
+    def decode(data):
+        # -----------------------------------------
+        # HEADER
+        # -----------------------------------------
+
+        first_byte = data[0]
+        second_byte = data[1]
+
+        fin = (first_byte >> 7) & 1
+        opcode = first_byte & 0x0F
+
+        masked = (second_byte >> 7) & 1
+        payload_length = second_byte & 0x7F
+
+        index = 2
+
+        # -----------------------------------------
+        # LONGUEUR ETENDUE
+        # -----------------------------------------
+
+        if payload_length == 126:
+            payload_length = struct.unpack(">H", data[index:index+2])[0]
+            index += 2
+
+        elif payload_length == 127:
+            payload_length = struct.unpack(">Q", data[index:index+8])[0]
+            index += 8
+
+        # -----------------------------------------
+        # CLE DE MASQUAGE
+        # -----------------------------------------
+
+        masking_key = b""
+
+        if masked:
+            masking_key = data[index:index+4]
+            index += 4
+
+        # -----------------------------------------
+        # PAYLOAD
+        # -----------------------------------------
+
+        payload = data[index:index+payload_length]
+
+        # -----------------------------------------
+        # DEMASQUAGE
+        # -----------------------------------------
+
+        if masked:
+
+            unmasked = bytearray()
+
+            for i in range(payload_length):
+                unmasked.append(payload[i] ^ masking_key[i % 4])
+
+            payload = bytes(unmasked)
+
+        return {
+            "fin": fin,
+            "opcode": opcode,
+            "masked": masked,
+            "payload": payload
+        }
+    
