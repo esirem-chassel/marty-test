@@ -181,8 +181,12 @@ class WebSocketFrame():
             return
         return bytes(b ^ m for b, m in zip(data, itertools.cycle(mask)))
 
-    @classmethod
-    def decode(self, data):
-        self.addDataToDecode(data)
+    def decode(self, raw):
+        self.addDataToDecode(data=raw)
         return self
     
+    def getAllMessages(self):
+        return {
+            'text': self.textMsgs,
+            'bin': self.binaryMsgs
+        }

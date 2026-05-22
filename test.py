@@ -58,7 +58,7 @@ def handle_client(client_socket, address):
             
             frame = ws.decode(data)
 
-            print(f"Text messages : ", frame)
+            print(f"Text messages : ", frame.getAllMessages()['text'])
             
             reply = ws.encode(
                 b"ACK",
@@ -71,7 +71,6 @@ def handle_client(client_socket, address):
             client_socket.send(reply)
 
         except Exception as e:
-            e.with_traceback()
             print("Erreur :", e)
             break
 
